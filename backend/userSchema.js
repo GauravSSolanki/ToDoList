@@ -2,10 +2,9 @@ const { default: mongoose } = require("mongoose");
 
 const userSchema = new mongoose.Schema(
     {
-        name:String,
-        email:String,
-        password:String
+        title:String,
+        description:String
     }
 )
 
-module.exports = mongoose.model("Users",userSchema);
+module.exports = mongoose.model("Todolist",userSchema);

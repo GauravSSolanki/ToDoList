@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./ToDolist.css";
+import axios from "axios";
 
 // import { MdCheckCircleOutline } from "react-icons/md";
 import { MdDone } from "react-icons/md";
@@ -14,36 +15,47 @@ function To_DoList() {
 
   // console.log(allTodo);
 
-  const AddTododata = () => {
-    let newTodo = {
-      title: newTitle,
-      description: newDes,
-    };
-
-    // setallTodo((olditem)=>{
-    //   return [newTodo, ...olditem] ;
-    // })
-    let updatetodo = [...allTodo];
-    updatetodo.push(newTodo);
-    setallTodo(updatetodo);
-    setnewTitle("");
-    setnewDes("");
+  const AddTododata = async () => {
+    try {
+      let newTodo = {
+        title: newTitle,
+        description: newDes,
+      };
+      // let updatetodo = [...allTodo];
+      // updatetodo.push(newTodo);
+      // setallTodo(updatetodo);
+      const res = await axios.post("http://localhost:4200/", newTodo, {
+        headers: {
+          "Content-Type": "application/json", // Set the content type to JSON
+          // Add other headers as needed
+        },
+      });
+      setnewTitle("");
+      setnewDes("");
+      console.log(res);
+      // getdata();
+    } catch (error) {
+      console.error("Error posting data:", error);
+    }
   };
 
-
-
-  const deleteTododata = (index) => {
-      setTimeout(()=>{
-      let removetodo = [...allTodo];
-      removetodo.splice(index, 1);
-      setallTodo(removetodo);
-  }, 200);
-  }
+  const deleteTododata = async (_id) => {
+    try {
+      // let removetodo = [...allTodo];
+      // removetodo.splice(index, 1);
+      // setallTodo(removetodo);
+      const res = await axios.delete(`http://localhost:4200/${_id}`);
+      console.log(res);
+      // getdata();
+    } catch (error) {
+      console.error("Error posting data:", error);
+    }
+  };
 
   function deleteTodoComp(index) {
-      let removetodo = [...Comptodo];
-      removetodo.splice(index, 1);
-      setComptodo(removetodo);
+    let removetodo = [...Comptodo];
+    removetodo.splice(index, 1);
+    setComptodo(removetodo);
   }
 
   const compTodo = (index) => {
@@ -57,6 +69,21 @@ function To_DoList() {
     comptoitem.push(Comp_todo_item);
     setComptodo(comptoitem);
   };
+
+  const getdata = async () => {
+    try {
+      const response = await axios.get("http://localhost:4200/");
+      // console.log(response.data);
+      setallTodo(response.data);
+      // console.log(allTodo);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
+    getdata();
+  }, [allTodo]);
 
   return (
     <div className="Main-Container">
@@ -87,7 +114,7 @@ function To_DoList() {
               ToDo
             </button>
             <button
-              className={`isActive  ${isActive === false && "Active"}`}
+              className={` isActive  ${isActive === false && "Active"}`}
               onClick={() => setisActive(false)}
             >
               {" "}
@@ -105,7 +132,7 @@ function To_DoList() {
                   <p className="para">{item.title} </p>
                   <p className="para-1">{item.description}</p>
                   <div className="icon-bar">
-                    <icon onClick={() => deleteTododata(index)}>
+                    <icon onClick={() => deleteTododata(item._id)}>
                       <MdDelete className="todolist-icon red" />
                     </icon>
                     <icon onClick={() => compTodo(index)}>
